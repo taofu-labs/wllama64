@@ -1,0 +1,24 @@
+name: Runner tools
+description: Install tools the self-hosted runner image lacks (gh, docker compose)
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        COMPOSE_VERSION: v2.39.1
+      run: |
+        set -euo pipefail
+        if ! command -v gh >/dev/null; then
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gh
+        fi
+        if ! docker compose version >/dev/null 2>&1; then
+          plugins="$HOME/.docker/cli-plugins"
+          mkdir -p "$plugins"
+          base="https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-linux-$(uname -m)"
+          curl -fsSL -o "$plugins/docker-compose" "$base"
+          echo "$(curl -fsSL "$base.sha256" | cut -d' ' -f1)  $plugins/docker-compose" | sha256sum -c -
+          chmod +x "$plugins/docker-compose"
+        fi
+        gh --version | head -1
+        docker compose version

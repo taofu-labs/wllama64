@@ -47,6 +47,8 @@ jobs:
           ref: main
           submodules: false
 
+      - uses: ./.github/actions/runner-tools
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
@@ -306,6 +308,8 @@ jobs:
           ref: ${{ needs.prepare.outputs.branch }}
           submodules: recursive
 
+      - uses: ./.github/actions/runner-tools
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
@@ -495,7 +499,8 @@ jobs:
           needs.generate.result == 'failure' ||
           needs.finalize.result == 'failure')
       }}
-    runs-on: org-public
+    # must report even when the self-hosted runner fails
+    runs-on: ubuntu-latest
     permissions:
       issues: write
 
