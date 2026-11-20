@@ -26,7 +26,7 @@ concurrency:
 jobs:
   prepare:
     name: Prepare upstream sync
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 20
     permissions:
       contents: write
@@ -291,7 +291,7 @@ jobs:
     name: Rebuild generated artifacts
     needs: prepare
     if: needs.prepare.outputs.changed == 'true'
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 90
     permissions:
       contents: read
@@ -370,7 +370,7 @@ jobs:
       - prepare
       - generate
     if: needs.prepare.outputs.changed == 'true' && needs.generate.result == 'success'
-    # waits for checks that need org-public, so it must not hold an org-public slot
+    # waits for checks that may need vars.RUNNER, so it must not hold a self-hosted slot
     runs-on: ubuntu-latest
     timeout-minutes: 200
     permissions:

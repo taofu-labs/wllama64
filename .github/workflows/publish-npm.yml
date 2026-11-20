@@ -34,7 +34,7 @@ jobs:
   inspect:
     name: Inspect release
     if: github.ref == 'refs/heads/main'
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 10
     outputs:
       dist_tag: ${{ steps.metadata.outputs.dist_tag }}
@@ -296,7 +296,7 @@ jobs:
     name: Build and test release artifact
     needs: inspect
     if: needs.inspect.outputs.should_publish == 'true'
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 180
     permissions:
       contents: read
@@ -546,7 +546,7 @@ jobs:
           (needs.inspect.outputs.should_publish == 'false' &&
             needs.publish.result == 'skipped'))
       }}
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 10
     permissions:
       contents: write
@@ -611,7 +611,7 @@ jobs:
       - inspect
       - release
     if: always() && needs.release.result == 'success'
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 45
     permissions:
       contents: read
