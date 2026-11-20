@@ -49,8 +49,10 @@ const browserProvider = SAFARI
 export default defineConfig({
   define: {
     __GITHUB_CI__: JSON.stringify(!!process.env.GITHUB_ACTIONS),
+    __HF_TOKEN__: JSON.stringify(process.env.HF_TOKEN ?? ''),
   },
   test: {
+    setupFiles: ['./vitest.setup.ts'],
     ...(AUTO ? { watch: false } : {}),
     ...(WEBGPU ? { testTimeout: 120_000 } : {}),
     exclude: [

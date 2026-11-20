@@ -7,8 +7,8 @@ the WebAssembly binding for [llama.cpp](https://github.com/ggerganov/llama.cpp).
 It keeps the upstream browser API while raising the default WebAssembly linear
 memory ceiling from 4 GiB to 16 GiB through Memory64.
 
-Current release: `1.1.0`, based on upstream Wllama `3.8.1`
-([`7ed17361`](https://github.com/ngxson/wllama/commit/7ed17361caf221a84aa1e80ca85a3d6324f3af85)).
+Current release: `1.3.0`, based on upstream Wllama `3.13.0`
+([`6647c1ea`](https://github.com/ngxson/wllama/commit/6647c1ea3837b2f0205a300c3bf5ff644aaa06bf)).
 
 - [Repository](https://github.com/taofu-labs/wllama64)
 - [Issues](https://github.com/taofu-labs/wllama64/issues)
@@ -34,6 +34,7 @@ Current release: `1.1.0`, based on upstream Wllama `3.8.1`
 - 🔌 OpenAI-compatible API (fully-typed built-in)
 - 🚀 WebGPU support
 - 🔥 Multimodal support (image and audio file input)
+- Speech support: text to speech, transcription and realtime audio
 - 🔥 Tool calling support
 - Can run inference directly on browser (using [WebAssembly SIMD](https://emscripten.org/docs/porting/simd.html)), no backend or GPU is needed!
 - No runtime dependency (see [package.json](./package.json))
@@ -62,6 +63,7 @@ Upstream-hosted examples retained by this fork:
 - Multimodal (vision) completion: https://github.ngxson.com/wllama/examples/multimodal/ ([source code](./examples/multimodal/index.html))
 - Tool calling: https://github.ngxson.com/wllama/examples/tools/ ([source code](./examples/tools/index.html))
 - Decision models: https://github.ngxson.com/wllama/examples/decision/ ([source code](./examples/decision/index.html))
+- Omni (voice chat, text to speech, realtime speech to text): https://github.ngxson.com/wllama/examples/omni/ ([source code](./examples/omni/index.html))
 
 ## How to use
 
@@ -87,7 +89,50 @@ const wllamaInstance = new Wllama({
 
 For complete code example, see [examples/main/src/utils/wllama.context.tsx](./examples/main/src/utils/wllama.context.tsx)
 
-NOTE: this example only covers completions usage. For embeddings, please see [examples/embeddings/index.html](./examples/embeddings/index.html)
+NOTE: this example only covers completions usage. For embeddings, please see [examples/embeddings/index.html](./examples/embeddings/index.html). For audio, see [Speech and realtime audio](#speech-and-realtime-audio)
+
+### Speech and realtime audio
+
+These APIs need a model with audio support and its mmproj file, for example [LFM3-Omni](https://huggingface.co/ggml-org/LFM3-Omni-2B-GGUF). Use `getLoadedContextInfo()` to see what the model can do (`has_audio_input`, `has_audio_output`, `has_audio_stream`, `has_live_asr`, `audio_voices`).
+
+```js
+// text to speech, returns a WAV file. Use stream: true to get chunks as they are generated
+const { audio, sample_rate } = await wllama.createSpeech({
+  input: 'Hello world',
+  voice: 'female',
+});
+
+// transcribe an audio file
+const { text } = await wllama.createTranscription({
+  file: await audioFile.arrayBuffer(),
+  language: 'en',
+});
+```
+
+A realtime session uses the same events as the OpenAI realtime API and the `/v1/realtime` route of llama-server. It holds one slot until `close()` is called, and inference only runs while `events()` is being read.
+
+```js
+const session = await wllama.createRealtimeSession();
+await session.send({ type: 'session.update', session: { type: 'transcription' } });
+
+// mono float samples at getLoadedContextInfo().audio_input_rate
+await session.appendAudio(samples);
+await session.send({ type: 'input_audio_buffer.commit' });
+
+for await (const event of session.events()) {
+  if (event.type === 'conversation.item.input_audio_transcription.delta') {
+    console.log(event.delta);
+  } else if (event.type === 'conversation.item.input_audio_transcription.completed') {
+    break;
+  }
+}
+await session.close();
+```
+
+There are 3 kinds of session:
+- Default: a conversation. Send `response.create` after the audio, the answer comes as `response.output_text.delta` and `response.output_audio.delta` events. Use `decodeRealtimeAudio()` to read the audio
+- `session.update` with `type: 'transcription'`: each committed audio buffer is transcribed on its own
+- `createRealtimeSession({ intent: 'transcription' })`: live ASR, the text comes out while the audio goes in. Needs `has_live_asr`, LFM3-Omni does not have it
 
 ### WebGPU support
 
@@ -249,7 +294,7 @@ const wllama = new Wllama(pathConfig, {
 ## Upstream tracking
 
 `wllama64` follows tested upstream Wllama release commits rather than arbitrary
-development snapshots. The current baseline is Wllama `3.8.1` at `7ed17361`.
+development snapshots. The current baseline is Wllama `3.13.0` at `6647c1ea`.
 Conflict resolutions preserve both upstream semantics and Memory64 support.
 
 For each upstream release, maintainers fetch the

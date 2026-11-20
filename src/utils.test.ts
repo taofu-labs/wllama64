@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'vitest';
+import { expect, test, describe, afterEach, vi } from 'vitest';
 import {
   joinBuffers,
   bufToText,
@@ -12,6 +12,8 @@ import {
   sortFileByShard,
   isValidGgufFile,
   needCompat,
+  isIOS,
+  isSupportMem64,
 } from './utils';
 
 describe('joinBuffers', () => {
@@ -271,5 +273,70 @@ describe('GGUF file validation', () => {
 
     // Case sensitivity
     expect(isValidGgufFile('model.GGUF?param=value')).toBe(false);
+  });
+});
+
+describe('isIOS', () => {
+  const mockNavigator = (userAgent: string, maxTouchPoints: number) => {
+    Object.defineProperty(navigator, 'userAgent', {
+      value: userAgent,
+      configurable: true,
+    });
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      value: maxTouchPoints,
+      configurable: true,
+    });
+  };
+
+  afterEach(() => {
+    delete (navigator as any).userAgent;
+    delete (navigator as any).maxTouchPoints;
+  });
+
+  test('detects iPhone, iPad and iPadOS desktop mode', () => {
+    mockNavigator(
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 16_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6.2 Mobile/15E148 Safari/604.1',
+      5
+    );
+    expect(isIOS()).toBe(true);
+    mockNavigator(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15',
+      5
+    );
+    expect(isIOS()).toBe(true);
+  });
+
+  test('ignores desktop browsers', () => {
+    mockNavigator(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15',
+      0
+    );
+    expect(isIOS()).toBe(false);
+    mockNavigator(
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36',
+      0
+    );
+    expect(isIOS()).toBe(false);
+  });
+});
+
+describe('isSupportMem64', () => {
+  test('needs both the Memory constructor and the compiler', () => {
+    // Safari 27: the Memory constructor accepts i64, the compiler does not
+    const memory = vi
+      .spyOn(WebAssembly, 'Memory')
+      .mockImplementation(function () {
+        return { grow: () => 1n };
+      } as any);
+    const validate = vi.spyOn(WebAssembly, 'validate');
+    try {
+      validate.mockReturnValue(true);
+      expect(isSupportMem64()).toBe(true);
+      validate.mockReturnValue(false);
+      expect(isSupportMem64()).toBe(false);
+    } finally {
+      memory.mockRestore();
+      validate.mockRestore();
+    }
   });
 });

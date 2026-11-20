@@ -203,16 +203,6 @@ export class CacheManager {
       },
     });
 
-    const metadata: CacheEntryMetadata = {
-      originalURL: url,
-      originalSize: total,
-      etag,
-      ...(options.metadataAdditional ?? {}),
-    };
-    if (sha256) {
-      metadata.sha256 = sha256;
-    }
-
     await this.sb.write(
       fileKey,
       response.body.pipeThrough(progressStream),
@@ -224,6 +214,17 @@ export class CacheManager {
       throw new Error(
         `Incomplete download of ${url}: expected ${total || loaded} bytes, received ${loaded}, stored ${storedSize}`
       );
+    }
+
+    const metadata: CacheEntryMetadata = {
+      originalURL: url,
+      // without Content-Length, the size is only known once the body is fully read
+      originalSize: total || loaded,
+      etag,
+      ...(options.metadataAdditional ?? {}),
+    };
+    if (sha256) {
+      metadata.sha256 = sha256;
     }
     await this.writeMetadata(fileKey, metadata);
   }

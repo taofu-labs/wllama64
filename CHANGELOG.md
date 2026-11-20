@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.0] - 2026-11-20
+
+### Changed
+
+- Sync upstream Wllama 3.13.0 at [`6647c1ea`](https://github.com/ngxson/wllama/commit/6647c1ea3837b2f0205a300c3bf5ff644aaa06bf) (llama.cpp `7d7f028`). Brings speech (`createSpeech()`), transcription (`createTranscription()`), realtime audio sessions, image and batch embeddings, `embd_normalize`, and a wasm/JS version check (`skipVersionCheck` to downgrade it to a warning).
+- Cross-Origin Storage follows the renamed `navigator.crossOriginStorage.getFileHandle()` API and shares cached files with all origins.
+- `wllama64/wasm-from-cdn` entry point for loading the wasm files from jsDelivr.
+- Repository moved to [taofu-labs/wllama64](https://github.com/taofu-labs/wllama64). CI runs on the `org-public` self-hosted runner; npm OIDC publishing stays on a GitHub-hosted runner.
+
+### Fixed
+
+- iOS and iPadOS (#14): cap the wasm memory maximum at 1 GiB. A reservation near the address space limit left Safari no memory to read the cached model (`NotReadableError`).
+- A model with a missing shard counts as not cached instead of throwing.
+- Audio input with 4 or more threads could hang: mtmd now shares the ggml threadpool instead of starting threads the pthread pool does not have. Backport of upstream [#332](https://github.com/ngxson/wllama/pull/332); the pool also covers `n_threads` > `n_threads_batch`.
+- Safari 27 accepted a Memory64 descriptor it cannot compile, so the Memory64 build was picked; detection now also validates a memory64 module. A load no longer hangs when the abort reason is an `Error`. Backport of upstream [#333](https://github.com/ngxson/wllama/pull/333).
+
 ## [1.2.0] - 2026-10-27
 
 ### Added

@@ -20,3 +20,8 @@
 /src/__screenshots__
 a.out.js
 a.out.wasm
+/src/wasm/wllama.wasm
+/cpp/test_glue
+/cpp/*.bin
+*.test.ts
+__screenshots__

@@ -10,11 +10,14 @@ let isCompat = false;
 let lastStack = '';
 let isAborted = false;
 let hasMultithread = false;
+let limitMemory = false;
 
 const WASM_PAGE_BYTES = 64 * 1024;
 const INITIAL_MEMORY_BYTES = 128 * 1024 * 1024;
 const MEMORY32_MAX_BYTES = 4 * 1024 * 1024 * 1024;
 const MEMORY64_MAX_BYTES = 16 * 1024 * 1024 * 1024;
+// iOS: a wasm memory near the address space limit leaves no room for file reads (NotReadableError)
+const LIMITED_MAX_BYTES = 1024 * 1024 * 1024;
 const MEMORY_FALLBACK_STEP_BYTES = 128 * 1024 * 1024;
 const ASYNC_FILE_READ_CHUNK_BYTES = 64 * 1024 * 1024;
 
@@ -52,6 +55,7 @@ const getWModuleConfig = (_argMainScriptBlob) => {
   var argMainScriptBlob = _argMainScriptBlob;
 
   isCompat = RUN_OPTIONS.compat;
+  limitMemory = !!RUN_OPTIONS.limitMemory;
   hasMultithread = pthreadPoolSize > 1;
 
   msg({
@@ -107,8 +111,10 @@ const getWModuleConfig = (_argMainScriptBlob) => {
     // Create the imported memory here for every mode so constrained runtimes
     // can negotiate a lower maximum before Emscripten initializes.
     wasmMemory: getWasmMemory(),
-    onAbort: function (message) {
+    onAbort: function (reason) {
       isAborted = true;
+      // the reason can be an Error (for example a failed wasm instantiate)
+      const message = reason?.message ?? String(reason);
       msg({ verb: 'signal.abort', args: ['abort', message, lastStack, null] });
     },
     onExit: function (code) {
@@ -127,7 +133,11 @@ const getWModuleConfig = (_argMainScriptBlob) => {
 // See: https://github.com/emscripten-core/emscripten/issues/19144
 //      https://github.com/godotengine/godot/issues/70621
 const getWasmMemory = () => {
-  const requestedMaxBytes = isCompat ? MEMORY32_MAX_BYTES : MEMORY64_MAX_BYTES;
+  const requestedMaxBytes = limitMemory
+    ? LIMITED_MAX_BYTES
+    : isCompat
+      ? MEMORY32_MAX_BYTES
+      : MEMORY64_MAX_BYTES;
   let maxBytes = requestedMaxBytes;
 
   while (maxBytes >= INITIAL_MEMORY_BYTES) {

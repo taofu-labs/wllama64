@@ -228,7 +228,6 @@ jobs:
             scripts/prepare_upstream_release.test.mjs
             src/glue/messages.ts
             src/wasm-from-cdn.ts
-            src/wasm/source-map.ts
             src/wasm/wllama.js
             src/wasm/wllama.wasm
             src/workers-code/generated.ts
@@ -355,7 +354,6 @@ jobs:
             package-lock.json
             src/glue/messages.ts
             src/wasm-from-cdn.ts
-            src/wasm/source-map.ts
             src/wasm/wllama.js
             src/wasm/wllama.wasm
             src/workers-code/generated.ts
@@ -403,7 +401,6 @@ jobs:
             package-lock.json
             src/glue/messages.ts
             src/wasm-from-cdn.ts
-            src/wasm/source-map.ts
             src/wasm/wllama.js
             src/wasm/wllama.wasm
             src/workers-code/generated.ts
@@ -413,7 +410,7 @@ jobs:
           done
 
           unexpected=$(git status --short | cut -c4- | grep -Ev \
-            '^(compat/wasm/wllama\.js|examples/main/package-lock\.json|package-lock\.json|src/glue/messages\.ts|src/wasm-from-cdn\.ts|src/wasm/source-map\.ts|src/wasm/wllama\.(js|wasm)|src/workers-code/generated\.ts)$' || true)
+            '^(compat/wasm/wllama\.js|examples/main/package-lock\.json|package-lock\.json|src/glue/messages\.ts|src/wasm-from-cdn\.ts|src/wasm/wllama\.(js|wasm)|src/workers-code/generated\.ts)$' || true)
           if [[ -n "$unexpected" ]]; then
             echo "Artifact introduced unexpected paths:" >&2
             echo "$unexpected" >&2

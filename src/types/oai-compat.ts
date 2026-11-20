@@ -301,10 +301,28 @@ export interface RawCompletionChunk {
 
 // Embeddings
 
+export type EmbeddingContent =
+  ChatCompletionMessageText | ChatCompletionMessageImage;
+
+/**
+ * A `EmbeddingContent[]` is one input: its parts are joined with no separator and give one embedding. Use `EmbeddingContent[][]` to get one embedding per entry.
+ */
+export type EmbeddingInput =
+  | string
+  | number[]
+  | string[]
+  | number[][]
+  | EmbeddingContent[]
+  | EmbeddingContent[][];
+
 export interface EmbeddingCreateParams {
-  input: string | string[] | number[] | number[][];
+  input: EmbeddingInput;
   model?: string;
   encoding_format?: 'float' | 'base64';
+  /**
+   * Embedding normalization mode: -1 = none, 0 = max absolute int16, 1 = taxicab, 2 = Euclidean/L2 (default), >2 = p-norm.
+   */
+  embd_normalize?: number;
   // dimensions?: number; // unsupported by llama.cpp
   // user?: string;
 }
@@ -402,4 +420,73 @@ export interface SystemOneResponse {
     input_tokens: number;
     output_tokens: number;
   };
+}
+
+// Speech (TTS), same fields as the /tts route of llama-server
+
+export interface SpeechParams {
+  input: string; // the text to speak
+  voice?: string; // see LoadedContextInfo.audio_voices
+  lang?: string;
+  speaker_ref?: ArrayBuffer; // WAV, MP3 or FLAC file to clone the voice from (convert other formats first, e.g. WebM/Opus), cannot be used with a voice from audio_voices
+  response_format?: 'wav' | 'pcm'; // pcm: raw float32 LE mono samples (default: wav)
+  n_predict?: number; // limit of audio frames (default: no limit)
+  top_k?: number;
+  top_p?: number;
+  seed?: number;
+  abortSignal?: AbortSignal;
+}
+
+export interface SpeechResponse {
+  audio: ArrayBuffer;
+  sample_rate: number;
+}
+
+export interface SpeechChunk extends SpeechResponse {
+  final: boolean;
+}
+
+// Transcription (ASR) of an audio file, OAI-compatible
+
+export interface TranscriptionParams {
+  file: ArrayBuffer; // WAV, MP3 or FLAC file (convert other formats first, e.g. WebM/Opus)
+  language?: string;
+  prompt?: string;
+  temperature?: number;
+  max_tokens?: number;
+  seed?: number;
+  stream?: boolean;
+  abortSignal?: AbortSignal;
+}
+
+export interface TranscriptionUsage {
+  type: 'tokens';
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+}
+
+export interface TranscriptionResponse {
+  type: 'transcript.text.done';
+  text: string;
+  usage: TranscriptionUsage;
+}
+
+export interface TranscriptionDelta {
+  type: 'transcript.text.delta';
+  delta: string;
+}
+
+export type TranscriptionChunk = TranscriptionDelta | TranscriptionResponse;
+
+// Realtime, events follow the OAI realtime schema, same as /v1/realtime of llama-server
+
+export interface RealtimeSessionParams {
+  intent?: 'transcription'; // live ASR, see LoadedContextInfo.has_live_asr
+  seed?: number;
+}
+
+export interface RealtimeEvent {
+  type: string;
+  [key: string]: any;
 }

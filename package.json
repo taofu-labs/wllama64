@@ -12,7 +12,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/taofu-labs/wllama64/issues"
+    "url": "https://github.com/actuallymentor/wllama64/issues"
   },
   "description": "Memory64 WebAssembly binding for llama.cpp - Enabling on-browser LLM inference",
   "directories": {
@@ -25,6 +25,12 @@
       "require": "./esm/index.cjs",
       "default": "./esm/index.js"
     },
+    "./wasm-from-cdn": {
+      "types": "./esm/wasm-from-cdn.d.ts",
+      "import": "./esm/wasm-from-cdn.js",
+      "require": "./esm/wasm-from-cdn.cjs",
+      "default": "./esm/wasm-from-cdn.js"
+    },
     "./wasm/wllama.wasm": "./esm/wasm/wllama.wasm",
     "./package.json": "./package.json"
   },
@@ -36,7 +42,7 @@
     "README.md",
     "README_banner.png"
   ],
-  "homepage": "https://github.com/taofu-labs/wllama64#readme",
+  "homepage": "https://github.com/actuallymentor/wllama64#readme",
   "main": "./esm/index.cjs",
   "module": "./esm/index.js",
   "name": "wllama64",
@@ -49,7 +55,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/taofu-labs/wllama64.git"
+    "url": "git+https://github.com/actuallymentor/wllama64.git"
   },
   "type": "module",
   "types": "./esm/index.d.ts",
@@ -59,11 +65,11 @@
     }
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.64.1",
     "@vitest/browser-playwright": "^4.1.11",
     "@vitest/browser-webdriverio": "^4.1.11",
     "express": "^5.2.1",
-    "playwright": "^1.62.1",
+    "playwright": "^1.64.1",
     "prettier": "^3.9.6",
     "terser": "^5.50.0",
     "tsup": "^8.5.1",
@@ -78,9 +84,9 @@
     "build:glue": "node ./cpp/generate_glue_prototype.js",
     "build:minified": "terser esm/index.js -o esm/index.min.js --compress --mangle --source-map",
     "build:test": "WLLAMA_TEST_BACKEND=1 npm run build:wasm",
-    "build:tsup": "tsup src/index.ts --format cjs,esm --clean",
+    "build:tsup": "tsup src/index.ts src/wasm-from-cdn.ts --format cjs,esm --clean",
     "build:typedef": "tsc --emitDeclarationOnly --declaration -p tsconfig.build.json",
-    "build:wasm": "./scripts/build_wasm.sh && npm run build:glue",
+    "build:wasm": "./scripts/build_wasm.sh && npm run build:glue && npm run build:worker",
     "build:worker": "./scripts/build_worker.sh",
     "check:package": "node scripts/check_package_size.js && node scripts/check_package_exports.mjs",
     "check:release-automation": "node --test scripts/prepare_upstream_release.test.mjs scripts/release_workflows.test.mjs",
@@ -106,13 +112,13 @@
     "test:safari": "BROWSER=safari vitest",
     "test:wgpu": "AUTO=1 WEBGPU=1 vitest run"
   },
-  "version": "1.2.0",
+  "version": "1.3.0",
   "wllama64": {
     "upstreamPackage": "@wllama/wllama",
-    "upstreamVersion": "3.8.1",
-    "upstreamCommit": "7ed17361caf221a84aa1e80ca85a3d6324f3af85",
+    "upstreamVersion": "3.13.0",
+    "upstreamCommit": "6647c1ea3837b2f0205a300c3bf5ff644aaa06bf",
     "upstreamRepository": "https://github.com/ngxson/wllama",
     "compatPackage": "@wllama/wllama-compat",
-    "compatVersion": "3.8.1"
+    "compatVersion": "3.13.0"
   }
 }

@@ -282,7 +282,14 @@ export const isSupportMem64 = (): boolean => {
       maximum: 1n,
       shared: true,
     } as any);
-    return (memory as any).grow(0n) === 1n;
+    // Safari 27 accepts the Memory above but cannot compile memory64, so ask the compiler too
+    // (module (memory i64 1))
+    return (
+      (memory as any).grow(0n) === 1n &&
+      WebAssembly.validate(
+        new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 4, 1])
+      )
+    );
   } catch {
     return false;
   }
@@ -339,6 +346,17 @@ export const isValidGgufFile = (path: string): boolean => {
  */
 export const isSafariMobile = (): boolean => {
   return !!navigator.userAgent.match(/Version\/([0-9\._]+).*Mobile.*Safari.*/); // ios
+};
+
+/**
+ * Check if the device runs iOS or iPadOS. iPadOS reports a desktop Mac user agent, but has touch input
+ */
+export const isIOS = (): boolean => {
+  return (
+    isSafariMobile() ||
+    /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  );
 };
 
 /**
