@@ -7,7 +7,7 @@
 - Sync upstream Wllama 3.13.0 at [`6647c1ea`](https://github.com/ngxson/wllama/commit/6647c1ea3837b2f0205a300c3bf5ff644aaa06bf) (llama.cpp `7d7f028`). Brings speech (`createSpeech()`), transcription (`createTranscription()`), realtime audio sessions, image and batch embeddings, `embd_normalize`, and a wasm/JS version check (`skipVersionCheck` to downgrade it to a warning).
 - Cross-Origin Storage follows the renamed `navigator.crossOriginStorage.getFileHandle()` API and shares cached files with all origins.
 - `wllama64/wasm-from-cdn` entry point for loading the wasm files from jsDelivr.
-- Repository moved to [taofu-labs/wllama64](https://github.com/taofu-labs/wllama64). CI runs on the `org-public` self-hosted runner; npm OIDC publishing stays on a GitHub-hosted runner.
+- Repository moved to [taofu-labs/wllama64](https://github.com/taofu-labs/wllama64). Workflows run on hosted runners unless the `RUNNER` repository variable names a self-hosted label such as `org-public`; npm OIDC publishing always stays hosted.
 
 ### Fixed
 
