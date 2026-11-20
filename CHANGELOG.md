@@ -13,7 +13,8 @@
 
 - iOS and iPadOS (#14): cap the wasm memory maximum at 1 GiB. A reservation near the address space limit left Safari no memory to read the cached model (`NotReadableError`).
 - A model with a missing shard counts as not cached instead of throwing.
-- Audio input with 4 or more threads could hang: mtmd now shares the ggml threadpool instead of starting threads the pthread pool does not have. Backport of upstream [#332](https://github.com/ngxson/wllama/pull/332); the pool also covers `n_threads` > `n_threads_batch`.
+- Downloads served with `Content-Encoding` are no longer rejected as incomplete; `Content-Length` counts the encoded bytes.
+- Audio input with 4 or more threads could hang: mtmd now shares the ggml threadpool instead of starting threads the pthread pool does not have. Backport of upstream [#332](https://github.com/ngxson/wllama/pull/332); the pthread pool also covers the extra mtmd pool of the upstream compat build and of `n_threads` > `n_threads_batch`.
 - Safari 27 accepted a Memory64 descriptor it cannot compile, so the Memory64 build was picked; detection now also validates a memory64 module. A load no longer hangs when the abort reason is an `Error`. Backport of upstream [#333](https://github.com/ngxson/wllama/pull/333).
 
 ## [1.2.0] - 2026-10-27
