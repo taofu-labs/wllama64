@@ -97,6 +97,8 @@ jobs:
 
           upstream_version=$(node -p "require('./package.json').wllama64.upstreamVersion")
           expected_commit=$(node -p "require('./package.json').wllama64.upstreamCommit")
+          # self-hosted runners can keep the checkout of a previous run
+          git remote remove upstream 2>/dev/null || true
           git remote add upstream https://github.com/ngxson/wllama.git
           git fetch --force upstream \
             "refs/tags/$upstream_version:refs/tags/verified-upstream-$upstream_version"

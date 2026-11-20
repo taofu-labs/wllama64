@@ -353,7 +353,6 @@ export const isSafariMobile = (): boolean => {
  */
 export const isIOS = (): boolean => {
   return (
-    isSafariMobile() ||
     /iPhone|iPad|iPod/.test(navigator.userAgent) ||
     (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
   );

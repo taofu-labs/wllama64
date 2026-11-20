@@ -81,6 +81,8 @@ jobs:
 
           exec 3>>"$GITHUB_OUTPUT"
           echo 'changed=false' >&3
+          # self-hosted runners can keep the checkout of a previous run
+          git remote remove upstream 2>/dev/null || true
           git remote add upstream "https://github.com/${UPSTREAM_REPOSITORY}.git"
           git fetch --force --prune upstream '+refs/tags/*:refs/tags/upstream/*'
 
@@ -364,7 +366,8 @@ jobs:
       - prepare
       - generate
     if: needs.prepare.outputs.changed == 'true' && needs.generate.result == 'success'
-    runs-on: org-public
+    # waits for checks that need org-public, so it must not hold an org-public slot
+    runs-on: ubuntu-latest
     timeout-minutes: 200
     permissions:
       contents: write

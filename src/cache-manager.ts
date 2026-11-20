@@ -209,7 +209,12 @@ export class CacheManager {
       hint
     );
     const storedSize = await this.sb.getSize(fileKey, hint);
-    if (storedSize !== loaded || (total > 0 && loaded !== total)) {
+    // with Content-Encoding, Content-Length counts the encoded bytes, not the decoded body
+    const isEncoded = !!response.headers.get('content-encoding');
+    if (
+      storedSize !== loaded ||
+      (total > 0 && !isEncoded && loaded !== total)
+    ) {
       await this.sb.delete(fileKey);
       throw new Error(
         `Incomplete download of ${url}: expected ${total || loaded} bytes, received ${loaded}, stored ${storedSize}`

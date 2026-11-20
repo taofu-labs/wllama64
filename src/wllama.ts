@@ -649,23 +649,26 @@ export class Wllama {
     const hwConccurency = Math.floor((navigator.hardwareConcurrency || 1) / 2);
     const nbThreads = params.n_threads ?? hwConccurency;
     const nbThreadsBatch = params.n_threads_batch ?? nbThreads;
-    // different counts create two persistent ggml threadpools; the pthread pool must fit both, or ggml waits for threads that never start
-    // mtmd reuses the batch pool only if it has at least n_threads, else it creates a third pool
-    const nbPoolThreads =
-      nbThreads === nbThreadsBatch
-        ? nbThreads
-        : nbThreads +
-          nbThreadsBatch +
-          (nbThreads > nbThreadsBatch ? nbThreads : 0);
-    this.nbThreads = nbThreads;
-    this.useMultiThread = supportMultiThread && nbPoolThreads > 1;
+    const modelFiles = await prepareBlobs(blobs);
 
-    // initialize the worker
     const workerResources = this.getWorkerResources();
     if (params.n_gpu_layers === 0) {
       // skip WebGPU device initialization when the user asks for CPU-only
       workerResources.noWebGPU = true;
     }
+
+    // different counts create two persistent ggml threadpools; the pthread pool must fit both, or ggml waits for threads that never start
+    // mtmd reuses the first pool only if it has at least n_threads; the upstream compat build never reuses it
+    const mtmdNeedsPool =
+      !!modelFiles.mmproj &&
+      (workerResources.compat || nbThreads > nbThreadsBatch);
+    const nbPoolThreads =
+      (nbThreads === nbThreadsBatch ? nbThreads : nbThreads + nbThreadsBatch) +
+      (mtmdNeedsPool ? nbThreads : 0);
+    this.nbThreads = nbThreads;
+    this.useMultiThread = supportMultiThread && nbPoolThreads > 1;
+
+    // initialize the worker
     const proxy = new ProxyToWorker(
       workerResources,
       this.useMultiThread ? nbPoolThreads : 0, // 0 means disable pthread
@@ -679,7 +682,6 @@ export class Wllama {
     }
 
     try {
-      const modelFiles = await prepareBlobs(blobs);
       await proxy.moduleInit(modelFiles.all);
 
       // run it
