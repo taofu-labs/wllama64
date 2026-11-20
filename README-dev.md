@@ -7,7 +7,7 @@ caching, compatibility, and inference. The package API remains named `Wllama`.
 
 Release `1.2.0` is based on upstream Wllama `3.8.1`
 ([`7ed17361`](https://github.com/ngxson/wllama/commit/7ed17361caf221a84aa1e80ca85a3d6324f3af85)). The canonical fork
-is [actuallymentor/wllama64](https://github.com/actuallymentor/wllama64).
+is [taofu-labs/wllama64](https://github.com/taofu-labs/wllama64).
 
 ## Upstream synchronization
 
@@ -245,7 +245,7 @@ Requirements:
 - You have Docker installed and running on your machine
 - On Windows, please use WSL
 
-1. Clone this repo locally: `git clone --recurse-submodules https://github.com/actuallymentor/wllama64.git`
+1. Clone this repo locally: `git clone --recurse-submodules https://github.com/taofu-labs/wllama64.git`
 2. `npm run build:test && npm run build`
 3. `npm run serve` and open http://localhost:8080/examples/test-backend-ops/
 

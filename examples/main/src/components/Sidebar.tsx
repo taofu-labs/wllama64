@@ -100,7 +100,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
               </li>
               <li>
                 <a
-                  href="https://github.com/actuallymentor/wllama64"
+                  href="https://github.com/taofu-labs/wllama64"
                   target="_blank"
                   rel="noopener"
                 >

@@ -26,7 +26,7 @@ concurrency:
 jobs:
   prepare:
     name: Prepare upstream sync
-    runs-on: ubuntu-latest
+    runs-on: org-public
     timeout-minutes: 20
     permissions:
       contents: write
@@ -289,7 +289,7 @@ jobs:
     name: Rebuild generated artifacts
     needs: prepare
     if: needs.prepare.outputs.changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: org-public
     timeout-minutes: 90
     permissions:
       contents: read
@@ -366,7 +366,7 @@ jobs:
       - prepare
       - generate
     if: needs.prepare.outputs.changed == 'true' && needs.generate.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: org-public
     timeout-minutes: 200
     permissions:
       contents: write
@@ -495,7 +495,7 @@ jobs:
           needs.generate.result == 'failure' ||
           needs.finalize.result == 'failure')
       }}
-    runs-on: ubuntu-latest
+    runs-on: org-public
     permissions:
       issues: write
 

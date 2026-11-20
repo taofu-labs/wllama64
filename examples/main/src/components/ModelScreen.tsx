@@ -228,7 +228,7 @@ function AddCustomModelDialog({ onClose }: { onClose(): void }) {
           Compatibility mode and constrained browsers may require GGUF files
           larger than 2 GiB to be split. If needed,{' '}
           <a
-            href="https://github.com/actuallymentor/wllama64?tab=readme-ov-file#split-model"
+            href="https://github.com/taofu-labs/wllama64?tab=readme-ov-file#split-model"
             target="_blank"
             rel="noopener"
             className="text-primary"

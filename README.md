@@ -10,9 +10,9 @@ memory ceiling from 4 GiB to 16 GiB through Memory64.
 Current release: `1.1.0`, based on upstream Wllama `3.8.1`
 ([`7ed17361`](https://github.com/ngxson/wllama/commit/7ed17361caf221a84aa1e80ca85a3d6324f3af85)).
 
-- [Repository](https://github.com/actuallymentor/wllama64)
-- [Issues](https://github.com/actuallymentor/wllama64/issues)
-- [Releases](https://github.com/actuallymentor/wllama64/releases)
+- [Repository](https://github.com/taofu-labs/wllama64)
+- [Issues](https://github.com/taofu-labs/wllama64/issues)
+- [Releases](https://github.com/taofu-labs/wllama64/releases)
 - [Upstream demo](https://huggingface.co/spaces/ngxson/wllama)
 - [Upstream API documentation](https://github.ngxson.com/wllama/docs/)
 - [WebGPU introduction](https://reeselevine.github.io/llamas-on-the-web/)
@@ -20,7 +20,7 @@ Current release: `1.1.0`, based on upstream Wllama `3.8.1`
 > [!NOTE]
 >
 > This is not an official Wllama release. Report fork-specific problems in the
-> [wllama64 issue tracker](https://github.com/actuallymentor/wllama64/issues).
+> [wllama64 issue tracker](https://github.com/taofu-labs/wllama64/issues).
 >
 > The Memory64 build retains the Wllama V3 API, including WebGPU, multimodal,
 > tool calling, parallel requests, and partial-download recovery. See the
@@ -276,7 +276,7 @@ You can use the commands below to compile it yourself:
 # /!\ IMPORTANT: Requires Docker Compose
 
 # Clone the repository with submodule
-git clone --recurse-submodules https://github.com/actuallymentor/wllama64.git
+git clone --recurse-submodules https://github.com/taofu-labs/wllama64.git
 cd wllama64
 
 # Optionally, update llama.cpp to its latest upstream version (bleeding-edge, use at your own risk!)
@@ -298,7 +298,7 @@ npm run build
 ## Acknowledgments
 
 `wllama64` is maintained independently at
-[actuallymentor/wllama64](https://github.com/actuallymentor/wllama64). Wllama was
+[taofu-labs/wllama64](https://github.com/taofu-labs/wllama64). Wllama was
 created and is maintained by [Xuan-Son Nguyen](https://ngxson.com/). The WebGPU
 backend for llama.cpp is maintained by
 [Reese Levine](https://reeselevine.github.io/). We thank all contributors to

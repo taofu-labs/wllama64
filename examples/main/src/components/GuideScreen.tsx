@@ -36,7 +36,7 @@ export default function GuideScreen() {
               Compatibility mode and constrained browsers may require files
               larger than 2 GiB to be split.{' '}
               <a
-                href="https://github.com/actuallymentor/wllama64?tab=readme-ov-file#split-model"
+                href="https://github.com/taofu-labs/wllama64?tab=readme-ov-file#split-model"
                 target="_blank"
                 rel="noopener"
               >
@@ -72,7 +72,7 @@ export default function GuideScreen() {
           Wllama64 is in development and bugs may occur. If you find a bug,
           please{' '}
           <a
-            href="https://github.com/actuallymentor/wllama64/issues"
+            href="https://github.com/taofu-labs/wllama64/issues"
             target="_blank"
             rel="noopener"
           >

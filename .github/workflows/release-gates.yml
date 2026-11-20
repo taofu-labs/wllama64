@@ -16,7 +16,7 @@ concurrency:
 jobs:
   release-gates:
     name: Release gates
-    runs-on: ubuntu-latest
+    runs-on: org-public
     timeout-minutes: 180
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
