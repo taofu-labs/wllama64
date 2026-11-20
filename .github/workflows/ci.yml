@@ -21,7 +21,7 @@ env:
 
 jobs:
   test:
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
 
     timeout-minutes: 45
 
@@ -63,7 +63,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN_READONLY }}
 
   lint:
-    runs-on: org-public
+    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
 
